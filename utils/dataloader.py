@@ -3,9 +3,13 @@ import torchvision
 from torchvision import transforms
 import os
 from PIL import Image
+import jpeg4py as jpeg
+import cv2
+
 
 def collate_fn(batch):
     batch = list(filter(lambda x: x is not None, batch))
+    # print(len(batch))
     return torch.utils.data.dataloader.default_collate(batch)
 
 class selfData:
@@ -19,7 +23,8 @@ class selfData:
     def __getitem__(self, index):
         try:
             img_path = self.img_list[index]
-            img = Image.open(img_path)
+            # img = jpeg.JPEG(img_path).decode()
+            img=cv2.imread(img_path)
             img = self.transforms(img)
             label = self.label_list[index]
         except:
@@ -28,3 +33,39 @@ class selfData:
     
     def __len__(self):
         return len(self.label_list)
+
+    def pull_img(self,index):
+        return cv2.imread(self.img_list[index],cv2.IMREAD_COLOR)
+    def pull_label(self,index):
+        return self.label_list[index]
+
+
+class data_prefetcher():
+    def __init__(self, loader):
+        self.loader = iter(loader)
+        # self.stream = torch.cuda.Stream()
+        self.preload()
+
+    def preload(self):
+        try:
+            self.next_data = next(self.loader)
+        except StopIteration:
+            self.next_input = None
+            return
+        # with torch.cuda.stream(self.stream):
+        #     self.next_data = self.next_data.cuda(non_blocking=True)
+
+    def next(self):
+        # torch.cuda.current_stream().wait_stream(self.stream)
+        data = self.next_data
+        self.preload()
+        return data
+
+class Compose(object):
+    def __init__(self,transforms):
+        self.transforms=transforms
+
+    def __call__(self, img):
+        for t in self.transforms:
+            img=t(img)
+        return img
