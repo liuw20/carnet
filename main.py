@@ -31,7 +31,7 @@ import torch.distributed as dist
 args = args_parser()
 
 # dist.init_process_group(backend='nccl')
-torch.cuda.set_device(args.local_rank)
+# torch.cuda.set_device(args.local_rank)
 
 def xavier(param):
     init.xavier_uniform(param)
@@ -44,6 +44,8 @@ def weights_init(m):
 transforms = transforms.Compose([
         transforms.ToTensor(),  # normalize to [0, 1]
         transforms.Resize(256),
+        transforms.RandomPerspective(),
+        transforms.RandomRotation(degrees=180),
         transforms.RandomResizedCrop(args.img_size),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
     ])

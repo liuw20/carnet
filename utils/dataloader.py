@@ -3,7 +3,6 @@ import torchvision
 from torchvision import transforms
 import os
 from PIL import Image
-import jpeg4py as jpeg
 import cv2
 
 
@@ -18,6 +17,13 @@ class selfData:
             lines = f.readlines()
             self.img_list = [os.path.join(img_path, i.split()[0]) for i in lines]
             self.label_list = [i.split()[1] for i in lines]
+            self.slot_id=list()
+            for line in lines:
+                id=line.split()[0]
+                slot=id.split('_')[-1]
+                slot=slot.split('.')[0]
+                self.slot_id.append(int(slot))
+            # print(self.slot_id)
             self.transforms = transforms
     
     def __getitem__(self, index):
@@ -35,7 +41,9 @@ class selfData:
         return len(self.label_list)
 
     def pull_img(self,index):
-        return cv2.imread(self.img_list[index],cv2.IMREAD_COLOR)
+        im=cv2.imread(self.img_list[index],cv2.IMREAD_COLOR)
+        # print(self.img_list[index])
+        return im
     def pull_label(self,index):
         return self.label_list[index]
 

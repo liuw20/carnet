@@ -18,7 +18,7 @@ from utils.options import args_parser
 
 args = args_parser()
 # learning_rates = np.array([0.7, 0.8, 0.9, 1, 1.1,10,100,1000])*1e-3
-learning_rates=np.array([10000,20000])*1e-5
+learning_rates=np.array([10000,20000])*1e-5*args.factor
 # learning_rates=np.array([0.2])
 # print(learning_rates)
 # exit()
@@ -26,7 +26,7 @@ learning_rates=np.array([10000,20000])*1e-5
 def train(epoch, img_path, target_path, transforms, net, criterion):
     train_dataset = selfData(img_path, target_path, transforms)
     data_size=len(train_dataset)
-    train_loader = DataLoader(train_dataset, batch_size = 64,  num_workers =32,drop_last= False,pin_memory=True,shuffle=True, collate_fn=collate_fn)
+    train_loader = DataLoader(train_dataset, batch_size = 64,  num_workers =16,drop_last= False,pin_memory=True,shuffle=True, collate_fn=collate_fn)
     # train_loader=list(train_loader)
     epoch_size=data_size//64
     net = torch.nn.DataParallel(net)
@@ -47,8 +47,8 @@ def train(epoch, img_path, target_path, transforms, net, criterion):
         for ep in range(epoch):
             net.train()
 
-            if ep %args.ep_lr_decay==0 and ep>0:
-                lr*=0.75
+            # if ep %args.ep_lr_decay==0 and ep>0:
+            #     lr*=0.75
             running_loss = 0.0
             # print("Epoch {}.".format(ep+1))
             prefetcher=data_prefetcher(train_loader)

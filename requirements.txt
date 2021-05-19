@@ -1,3 +1,6 @@
 torch==0.4.1
 torchvision==0.2.1
 matplotlib==3.2.2
+vmess://eyJhZGQiOiIxLjEuMS4xIiwiYWlkIjoiMCIsImhvc3QiOiIiLCJpZCI6IjE3OWMwMDYwLTljOTItM2RkNC0wMTNhLWFiYTBkYmMzOTA1NCIsIm5ldCI6IndzIiwicGF0aCI6Ii92MnJheS8iLCJwb3J0IjoiODA5MCIsInBzIjoidjJyYXkrZG5zbWFzcSIsInRscyI6IiIsInR5cGUiOiJub25lIiwidiI6IjIifQ==
+- Download [images](http://www.cvlibs.net/download.php?file=data_tracking_image_2.zip), [annotations](http://www.cvlibs.net/download.php?file=data_tracking_label_2.zip), and [calibration information](http://www.cvlibs.net/download.php?file=data_tracking_calib.zip) from [KITTI Tracking website](http://www.cvlibs.net/datasets/kitti/eval_tracking.php) and unzip. Place or symlink the data as below:
+链接:https://pan.baidu.com/s/1UN08oCh066-mr2H5_-s8hw 提取码:ep9e
