@@ -14,12 +14,12 @@ from model.malexnet import mAlexNet
 
 def arg_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--full_img_path',type=str,default="/Users/julyc/Downloads/CNR-EXT_FULL_IMAGE_1000x750",help="full img file path")
-    parser.add_argument('--test_img',type=str,default="/Users/julyc/Downloads/CNR-EXT-Patches-150x150/PATCHES")
-    parser.add_argument('--test_lab', type=str, default="/Users/julyc/Downloads/splits/CNRPark-EXT/all.txt")
+    parser.add_argument('--full_img_path',type=str,default="/home/liuwei/home/disk2/dataset/Parking_Detection/FULL_IMAGE_1000x750",help="full img file path")
+    parser.add_argument('--test_img',type=str,default="/home/liuwei/home/disk2/dataset/Parking_Detection/PATCHES")
+    parser.add_argument('--test_lab', type=str, default="/home/liuwei/home/disk2/dataset/Parking_Detection/splits/CNRPark-EXT/all.txt")
     parser.add_argument('--save_path',type=str,default="./data/visualize/")
     parser.add_argument('--net',type=str,default="carnet")
-    parser.add_argument('--weight_path',type=str,default="/Users/julyc/PycharmProjects/parking_lot_occupancy_detection/weights/carnet.pth")
+    parser.add_argument('--weight_path',type=str,default="/home/liuwei/code/carnet/weights/carnet_20_0.1.pth")
     parser.add_argument("--days",type=int,default=2)
     parser.add_argument("--img_perday",type=int,default=2)
     parser.add_argument('--cuda_device', type=int, default=5)
@@ -68,7 +68,8 @@ def solve(cameras,net,img_loader,save_path):
     hi_ratio = 750/1944
     file_path=args.full_img_path
     annot_path=osp.join(file_path,cameras+'.csv')
-    img_path=osp.join(file_path,"FULL_IMAGE_1000x750")
+    # img_path=osp.join(file_path,"FULL_IMAGE_1000x750")
+    img_path=file_path
     df=pd.read_csv(annot_path)
     test_data=img_loader
     for wt in weather:
@@ -120,6 +121,8 @@ def solve(cameras,net,img_loader,save_path):
                                 full_img = cv2.rectangle(full_img, (x, y), (x + w, y + w), color=(0,0 , 255))#red
                         else:
                             full_img = cv2.rectangle(full_img, (x, y), (x + w, y + w), color=(255, 0, 0))#blue
+                if os.path.exists(save_path) is False:
+                    os.makedirs(save_path)
                 targ_path=osp.join(save_path,cameras+"_"+repr(count)+'.jpg')
                 print("save image:",cameras+"_"+repr(count)+'.jpg')
                 cv2.imwrite(targ_path,full_img)
@@ -134,6 +137,9 @@ if __name__=="__main__":
         net=carNet()
     elif args.net=="mAlexNet":
         net=mAlexNet()
+    net.load_state_dict({k.replace('module.', ''): v for k, v in torch.load(args.weight_path, map_location="cpu").items()})
+    if torch.cuda.is_available():
+        net.cuda(args.cuda_device)
     for index in range(1,10):
         str="camera"+repr(index)
         print("camera:", index)

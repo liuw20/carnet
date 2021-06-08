@@ -1,6 +1,6 @@
 from torch.autograd import Variable
 import os.path as osp
-from utils.dataloader import selfData, collate_fn,Compose
+from utils.dataloader import selfData, collate_fn
 import torch
 import torch.nn as nn
 from model.malexnet import mAlexNet
@@ -15,6 +15,7 @@ import numpy as np
 from tqdm import tqdm
 import os
 import cv2
+import torchvision.models as models
 import torch.nn.functional as F
 args = args_parser()
 transforms = transforms.Compose([
@@ -81,7 +82,7 @@ def eval(img_path,target_path, net,str="rainy"):
 
 if __name__=="__main__":
 
-    net=carNet()
+    net=models.inception_v3()
     net.load_state_dict({k.replace('module.',''):v for k,v in torch.load(args.path,map_location="cpu").items()})
     if torch.cuda.is_available():
         net.cuda(args.cuda_device)

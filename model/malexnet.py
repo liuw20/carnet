@@ -23,7 +23,6 @@ class mAlexNet(nn.Module):
         )
         self.layer4 = nn.Sequential(
             nn.Linear(30*3*3, out_features=48),
-            #nn.Linear(30, out_features=48),
             nn.ReLU(inplace=True)
         )
         self.layer5 = nn.Sequential(

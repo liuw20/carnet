@@ -13,17 +13,26 @@ from torchvision import transforms
 from torch.utils.data.distributed import DistributedSampler
 from utils.options import args_parser
 from tqdm import tqdm
-import torch.nn.functional as F
-import cv2
+import torchvision.models as models
+import model.shuffleNetV2SE
+import model.shuffleNetV2SE
+import model.shuffleNet
+import model.shuffleNet_K5
+import model.shufflenet_v2_liteconv
+import model.shufflenet_v2_k5_liteconv
+import model.shufflenet_v2_csp
+import model.shufflenet_v2_sk_attention
+
 args = args_parser()
 transforms = transforms.Compose([
         transforms.ToTensor(),  # normalize to [0, 1]
-        transforms.Resize((args.img_size,args.img_size)),
-        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+        transforms.Resize((224,224)),
+        # transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+        transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                         std=[0.229, 0.224, 0.225])
     ])
 def test(img_path,target_path, transforms, net):
     print("\nTesting starts now...")
-
     net.eval()
     test_dataset = selfData(img_path, target_path, transforms)
     test_loader = DataLoader(test_dataset, batch_size = 64, shuffle = False, num_workers = 8,drop_last= False,pin_memory=True,collate_fn=collate_fn)
@@ -91,9 +100,38 @@ def test(img_path,target_path, transforms, net):
 #         print("Acc:",(correct/total))
 
 if __name__=="__main__":
-    net=carNet()
+    if args.model=='mobilenet_v3_small':
+        net = models.mobilenet_v3_small()
+        net.classifier[3] = nn.Linear(1024, 2)
+    elif args.model=='mobilenet_v2':
+        net = models.mobilenet_v2()
+        net.classifier[1] = nn.Linear(1280, 2)
+    elif args.model=="ShuffleNet_v2":
+        net=models.shufflenet_v2_x1_0()
+        net.fc = nn.Linear(1024, 2)
+    elif args.model == "mobilenet_v3_large":
+        net = models.mobilenet_v3_large()
+        net.classifier[3] = nn.Linear(1280, 2)
+    elif args.model == 'mAlexNet':
+        net = mAlexNet()
+    elif args.model=='carnet':
+        net=carNet()
+    elif args.model == "ShuffleNet_v2_SE":
+        net = model.shuffleNetV2SE.ShuffleNetV2SE()
+    elif args.model == "ShuffleNet_v2":
+        net = model.shuffleNet.ShuffleNetV2()
+    elif args.model == "ShuffleNet_K5":
+        net = model.shuffleNet_K5.ShuffleNetV2K5()
+    elif args.model == 'ShuffleNet_v2_csp':
+        net = model.shufflenet_v2_csp.ShuffleNetV2CSP()
+    elif args.model == 'ShuffleNet_v2_k5_liteconv':
+        net = model.shufflenet_v2_k5_liteconv.ShuffleNetV2K5Lite()
+    elif args.model == 'ShuffleNet_v2_sk':
+        net = model.shufflenet_v2_sk_attention.ShuffleNetV2SK()
+    elif args.model == 'ShuffleNet_v2_liteconv':
+        net = model.shufflenet_v2_liteconv.ShuffleNetV2LiteConv()
     torch.set_default_tensor_type('torch.FloatTensor')
-    print("test net:carNet..")
+    print("test net:{}..".format(args.model))
     # print({k.replace('module.',''):v for k,v in torch.load(args.path,map_location="cpu").items()})
     # exit()
     net.load_state_dict({k.replace('module.',''):v for k,v in torch.load(args.path,map_location="cpu").items()})

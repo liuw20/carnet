@@ -17,12 +17,12 @@ class selfData:
             lines = f.readlines()
             self.img_list = [os.path.join(img_path, i.split()[0]) for i in lines]
             self.label_list = [i.split()[1] for i in lines]
-            self.slot_id=list()
-            for line in lines:
-                id=line.split()[0]
-                slot=id.split('_')[-1]
-                slot=slot.split('.')[0]
-                self.slot_id.append(int(slot))
+            # self.slot_id=list()
+            # for line in lines:
+            #     id=line.split()[0]
+            #     slot=id.split('_')[-1]
+            #     slot=slot.split('.')[0]
+            #     self.slot_id.append(int(slot))
             # print(self.slot_id)
             self.transforms = transforms
     
@@ -69,11 +69,11 @@ class data_prefetcher():
         self.preload()
         return data
 
-class Compose(object):
-    def __init__(self,transforms):
-        self.transforms=transforms
-
-    def __call__(self, img):
-        for t in self.transforms:
-            img=t(img)
-        return img
+# class Compose(object):
+#     def __init__(self,transforms):
+#         self.transforms=transforms
+#
+#     def __call__(self, img):
+#         for t in self.transforms:
+#             img=t(img)
+#         return img
